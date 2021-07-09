@@ -42,5 +42,58 @@ CHIP ALU {
         ng; // 1 if (out < 0),  0 otherwise
 
     PARTS:
-   // Put you code here:
+        //zx
+        Out16(in=zx, out=outzx);
+        Not16(in=outzx, out=notzx);
+        And16(a=x, b=notzx, out=zxx);
+        
+        //zy
+        Out16(in=zy, out=outzy);
+        Not16(in=outzy, out=notzy);
+        And16(a=y, b=notzy, out=zyy);
+        
+        //nx
+        Out16(in=nx, out=outnx);
+        Not16(in=zxx, out=notzxx);
+        Not16(in=outnx, out=notnx);
+        And16(a=zxx, b=notnx, out=andzxx);
+        And16(a=notzxx, b=outnx, out=andnx);
+        Or16(a=andzxx, b=andnx, out=nxx);
+
+        //ny
+        Out16(in=ny, out=outny);
+        Not16(in=zyy, out=notzyy);
+        Not16(in=outny, out=notny);
+        And16(a=zyy, b=notny, out=andzyy);
+        And16(a=notzyy, b=outny, out=andny);
+        Or16(a=andzyy, b=andny, out=nyy);
+
+        // Xor(a=zxx, b=nx, out=nxx);
+        // Xor(a=zyy, b=ny, out=nyy);
+
+        //f
+        Out16(in=f, out=outf);
+        Not16(in=outf, out=notf);
+        Add16(a=nxx, b=nyy, out=addout);
+        And16(a=addout, b=outf, out=faddout);
+        And16(a=nxx, b=nyy, out=andout);
+        And16(a=andout, b=notf, out=fandout);
+        Or16(a=fandout, b=faddout, out=fout);
+
+        //no
+        Out16(in=no, out=outno);
+        Not16(in=fout, out=notfout);
+        Not16(in=outno, out=notno);
+        And16(a=fout, b=notno, out=andfout);
+        And16(a=notfout, b=outno, out=andno);
+        Or16(a=andfout, b=andno, out=out, out[0..7]=left, out[8..15]=right, out[15]=first);   
+
+        //zr
+        Or8Way(in=left, out=ng0);
+        Or8Way(in=right, out=ng1);
+        Or(a=ng0, b=ng1, out=zr0);
+        Not(in=zr0, out=zr);
+
+        //ng
+        Or(a=first, b=false, out=ng);
 }
