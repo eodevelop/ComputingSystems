@@ -54,22 +54,11 @@ CHIP ALU {
         
         //nx
         Out16(in=nx, out=outnx);
-        Not16(in=zxx, out=notzxx);
-        Not16(in=outnx, out=notnx);
-        And16(a=zxx, b=notnx, out=andzxx);
-        And16(a=notzxx, b=outnx, out=andnx);
-        Or16(a=andzxx, b=andnx, out=nxx);
+        Xor16(a=zxx, b=outnx, out=nxx);
 
         //ny
         Out16(in=ny, out=outny);
-        Not16(in=zyy, out=notzyy);
-        Not16(in=outny, out=notny);
-        And16(a=zyy, b=notny, out=andzyy);
-        And16(a=notzyy, b=outny, out=andny);
-        Or16(a=andzyy, b=andny, out=nyy);
-
-        // Xor(a=zxx, b=nx, out=nxx);
-        // Xor(a=zyy, b=ny, out=nyy);
+        Xor16(a=zyy, b=outny, out=nyy);
 
         //f
         Out16(in=f, out=outf);
