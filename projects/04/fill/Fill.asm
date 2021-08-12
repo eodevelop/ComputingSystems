@@ -13,32 +13,55 @@
 
 // Put your code here.
 (LOOP)
+    @SCREEN
+    D=A
+
+    @POS
+    M=D
+
+//키 입력 확인후 입력 있는 경우 BLACK으로 이동
     @KBD
     D=M
 
-    @END
+    @BLACKLOOP
     D;JGT
 
-    @SCREEN
+(WHITELOOP)
+    @POS
+    A=M
     M=0
+
+    @POS
+    M=M+1
+
+    @24576
+    D=A
+
+    @POS
+    D=D-M
+
+    @WHITELOOP
+    D;JGT
 
     @LOOP
     0;JMP
 
-(END)    
+(BLACKLOOP)
+    @POS
+    A=M
+    M=-1
 
-(BLACK)
-    @SCREEN
-    //M=-1
+    @POS
+    M=M+1
+
+    @24576
     D=A
-    
-    @SUM+1
-    M=D
 
-    @SUM+1
-    AM=-1
+    @POS
+    D=D-M
 
-(BLACKEND)
+    @BLACKLOOP
+    D;JGT
 
     @LOOP
     0;JMP
