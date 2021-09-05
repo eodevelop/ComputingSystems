@@ -39,5 +39,45 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-    // Put your code here:
+        // A명령어일 때 [0nnnnnnnnnnnnnnn]
+        // C명령어일 때 [1xxaccccccdddjjj]
+        // i - 명령어 종류
+        And(a=instruction[15], b=true, out=i);
+        Not(in=i, out=outi);
+
+        // x비트 - 미사용
+        // a면 0, c면 1
+        // a비트 - 연산 담당
+        And(a=instruction[12], b=true, out=a);
+
+        // c비트 - 연산 구체적인 내용
+        And(a=instruction[11], b=true, out=c1);
+        And(a=instruction[10], b=true, out=c2);
+        And(a=instruction[9], b=true, out=c3);
+        And(a=instruction[8], b=true, out=c4);
+        And(a=instruction[7], b=true, out=c5);
+        And(a=instruction[6], b=true, out=c6);
+
+        // d비트 dest
+        And(a=instruction[5], b=true, out=d1);
+        And(a=instruction[4], b=true, out=d2);
+        And(a=instruction[3], b=true, out=d3);
+
+        And(a=i, b=d1, out=writeA);
+        And(a=i, b=d2, out=writeD);
+        //C 연산이고 d3가 1이면 메모리에 쓰는 연산을 한다.
+        And(a=i, b=d3, out=writeM);
+        
+        // j 비트 jump
+        And(a=instruction[2], b=true, out=j1);
+        And(a=instruction[1], b=true, out=j2);
+        And(a=instruction[0], b=true, out=j3);
+
+        Mux16(a=instruction, b=outMP, sel=i, out=IOutM);
+        ARegister(in=IOutM, load=writeA, out[0..14]=addressM, out=A);
+        Mux16(a=A, b=inM, sel=a, out=AM);
+
+        DRegister(in=outMP, load=writeD, out=D);
+
+        ALU(x=D , y=AM , zx=c1, nx=c2, zy=c3, ny=c4, f=c5, no=c6, out=outMP, out=outM);
 }
