@@ -82,7 +82,32 @@ CHIP CPU {
 
         DRegister(in=outMP, load=writeD, out=D);
 
-        ALU(x=D , y=AM , zx=c1, nx=c2, zy=c3, ny=c4, f=c5, no=c6, out=outMP, out=outM);
+        ALU(x=D , y=AM , zx=c1, nx=c2, zy=c3, ny=c4, f=c5, no=c6, out=outMP, out=outM, zr=zr, ng=ng);
 
-        PC(in=A, load=c1, inc=c2, reset=reset, out[0..14]=pc);
+        //j1            j2          j3          연상기호 효과
+        //(out ＜ 0)    (out ＝ 0)  (out ＞ 0)
+        //0             0           0           null    점프하지 않음
+        //0             0           1           JGT     out ＞ 0이면 점프
+        //0             1           0           JEQ     out ＝ 0이면 점프
+        //0             1           1           JGE     out ≥ 0이면 점프
+        //1             0           0           JLT     out ＜ 0이면 점프
+        //1             0           1           JNE     out ≠ 0이면 점프
+        //1             1           0           JLE     out ≤ 0이면 점프
+        //1             1           1           JMP     점프
+        Not(in=ng, out=nng);
+        Not(in=zr, out=nzr);
+        And(a=nng, b=nzr, out=pg);
+        And(a=j1, b=ng, out=JLT);
+        And(a=j2, b=zr, out=JEQ);
+        And(a=j3, b=pg, out=JGT);
+
+        And(a=JLT, b=JEQ, out=JLE);
+        And(a=JLT, b=JGT, out=JNE);
+        And(a=JEQ, b=JGT, out=JGE);
+
+        Or8Way(in[0]=JLT,in[1]=JEQ,in[2]=JGT,in[3]=JLE,in[4]=JNE,in[5]=JGE,in[6]=false,in[7]=false,out=PJMP);
+        And(a=PJMP, b=i, out=JMP);
+        Not(in=JMP, out=NJMP);
+
+        PC(in=A, load=JMP, inc=NJMP, reset=reset, out[0..14]=pc);
 }
